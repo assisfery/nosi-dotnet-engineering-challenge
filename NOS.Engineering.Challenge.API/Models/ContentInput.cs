@@ -12,6 +12,8 @@ public class ContentInput
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
 
+    public IEnumerable<string> GenreList { get; set; } = new List<string>();
+
     public ContentDto ToDto()
     {
         return new ContentDto(
@@ -22,7 +24,7 @@ public class ContentInput
             Duration,
             StartTime,
             EndTime,
-            new List<string>()
+            GenreList
         );
     }
 }

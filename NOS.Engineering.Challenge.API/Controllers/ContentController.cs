@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using NOS.Engineering.Challenge.API.Models;
 using NOS.Engineering.Challenge.Managers;
+using NOS.Engineering.Challenge.Models;
 
 namespace NOS.Engineering.Challenge.API.Controllers;
 
@@ -68,12 +69,30 @@ public class ContentController : Controller
     }
     
     [HttpPost("{id}/genre")]
-    public Task<IActionResult> AddGenres(
+    public async Task<IActionResult> AddGenres(
         Guid id,
         [FromBody] IEnumerable<string> genre
     )
     {
-        return Task.FromResult<IActionResult>(StatusCode((int)HttpStatusCode.NotImplemented));
+        var content = await _manager.GetContent(id).ConfigureAwait(false);
+
+        if (content == null)
+            return NotFound();
+        
+        List<string> listGenre = content.GenreList.ToList();   
+        foreach (string g in  genre)
+        {
+            if(!listGenre.Contains(g))
+            {
+                listGenre.Add(g);
+            }
+        }
+
+        ContentInput input = new ContentInput();
+        input.GenreList = listGenre;
+        var updatedContent = await _manager.UpdateContent(id, input.ToDto()).ConfigureAwait(false);
+
+        return updatedContent == null ? NotFound() : Ok(updatedContent);
     }
     
     [HttpDelete("{id}/genre")]
