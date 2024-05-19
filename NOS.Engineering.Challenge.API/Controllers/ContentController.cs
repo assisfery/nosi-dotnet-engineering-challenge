@@ -96,11 +96,29 @@ public class ContentController : Controller
     }
     
     [HttpDelete("{id}/genre")]
-    public Task<IActionResult> RemoveGenres(
+    public async Task<IActionResult> RemoveGenres(
         Guid id,
         [FromBody] IEnumerable<string> genre
     )
     {
-        return Task.FromResult<IActionResult>(StatusCode((int)HttpStatusCode.NotImplemented));
+        var content = await _manager.GetContent(id).ConfigureAwait(false);
+
+        if (content == null)
+            return NotFound();
+
+        List<string> listGenre = content.GenreList.ToList();
+        foreach (string g in genre)
+        {
+            if (listGenre.Contains(g))
+            {
+                listGenre.Remove(g);
+            }
+        }
+
+        ContentInput input = new ContentInput();
+        input.GenreList = listGenre;
+        var updatedContent = await _manager.UpdateContent(id, input.ToDto()).ConfigureAwait(false);
+
+        return updatedContent == null ? NotFound() : Ok(updatedContent);
     }
 }
