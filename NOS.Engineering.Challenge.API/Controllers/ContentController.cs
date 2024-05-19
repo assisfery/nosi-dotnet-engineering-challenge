@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NOS.Engineering.Challenge.API.Models;
 using NOS.Engineering.Challenge.Managers;
 using NOS.Engineering.Challenge.Models;
@@ -11,14 +12,18 @@ namespace NOS.Engineering.Challenge.API.Controllers;
 public class ContentController : Controller
 {
     private readonly IContentsManager _manager;
-    public ContentController(IContentsManager manager)
+    private readonly ILogger<ContentController> _logger;
+    public ContentController(IContentsManager manager, ILogger<ContentController> logger)
     {
         _manager = manager;
+        _logger = logger;
     }
     
     [HttpGet]
     public async Task<IActionResult> GetManyContents()
     {
+        _logger.LogInformation("Listing Contents");
+
         var contents = await _manager.GetManyContents().ConfigureAwait(false);
 
         if (!contents.Any())
@@ -30,6 +35,8 @@ public class ContentController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetContent(Guid id)
     {
+        _logger.LogInformation("Get Content for " + id.ToString());
+
         var content = await _manager.GetContent(id).ConfigureAwait(false);
 
         if (content == null)
@@ -43,6 +50,8 @@ public class ContentController : Controller
         [FromBody] ContentInput content
         )
     {
+        _logger.LogInformation("Creating Content");
+
         var createdContent = await _manager.CreateContent(content.ToDto()).ConfigureAwait(false);
 
         return createdContent == null ? Problem() : Ok(createdContent);
@@ -54,6 +63,8 @@ public class ContentController : Controller
         [FromBody] ContentInput content
         )
     {
+        _logger.LogInformation("Updating Content");
+
         var updatedContent = await _manager.UpdateContent(id, content.ToDto()).ConfigureAwait(false);
 
         return updatedContent == null ? NotFound() : Ok(updatedContent);
@@ -64,6 +75,8 @@ public class ContentController : Controller
         Guid id
     )
     {
+        _logger.LogInformation("Deleting Content");
+
         var deletedId = await _manager.DeleteContent(id).ConfigureAwait(false);
         return Ok(deletedId);
     }
@@ -74,6 +87,8 @@ public class ContentController : Controller
         [FromBody] IEnumerable<string> genre
     )
     {
+        _logger.LogInformation("Add Genres to Content");
+
         var content = await _manager.GetContent(id).ConfigureAwait(false);
 
         if (content == null)
@@ -101,6 +116,8 @@ public class ContentController : Controller
         [FromBody] IEnumerable<string> genre
     )
     {
+        _logger.LogInformation("Delete Genres from Content");
+
         var content = await _manager.GetContent(id).ConfigureAwait(false);
 
         if (content == null)
