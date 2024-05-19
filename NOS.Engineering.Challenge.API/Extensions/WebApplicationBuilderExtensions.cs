@@ -35,7 +35,8 @@ public static class WebApplicationBuilderExtensions
 
     private static IServiceCollection RegisterSlowDatabase(this IServiceCollection services)
     {
-        services.AddSingleton<IDatabase<Content, ContentDto>,SlowDatabase<Content, ContentDto>>();
+        //services.AddSingleton<IDatabase<Content, ContentDto>, SlowDatabase<Content, ContentDto>>();
+        services.AddSingleton<IDatabase<Content, ContentDto>,FastDatabase<Content, ContentDto>>();
         services.AddSingleton<IMapper<Content, ContentDto>, ContentMapper>();
         services.AddSingleton<IMockData<Content>, MockData>();
 
