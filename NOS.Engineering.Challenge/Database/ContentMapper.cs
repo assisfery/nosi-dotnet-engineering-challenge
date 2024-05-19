@@ -1,4 +1,5 @@
 using NOS.Engineering.Challenge.Models;
+using System.Linq;
 
 namespace NOS.Engineering.Challenge.Database;
 
@@ -41,5 +42,15 @@ public class ContentMapper : IMapper<Content, ContentDto>
     //{
     //    return item;
     //}
+
+    public IEnumerable<Content> filter(IEnumerable<Content> itens, String title, List<String> genre)
+    {
+        var filtered = from c in itens
+                       where (title == null || c.Title == title)
+                       && (genre.Count == 0 || c.GenreList.Intersect(genre).Any())
+                       select c;
+
+        return filtered;
+    }
 
 }

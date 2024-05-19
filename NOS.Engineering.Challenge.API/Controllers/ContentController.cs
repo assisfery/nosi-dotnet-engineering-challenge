@@ -41,6 +41,29 @@ public class ContentController : Controller
         return Ok(contents);
     }
 
+    [HttpGet]
+    [Route("~/api/v2/[controller]")]    
+    public async Task<IActionResult> SearchContents([FromQuery] String? title, [FromQuery] List<string>? genres)
+    {
+        _logger.LogInformation("Listing Contents");
+
+        //string cacheKey = "SearchContents:" + title + ":" + genres;
+        //if (!_cache.TryGetValue(cacheKey, out IEnumerable<Content?>? contents))
+        //{
+        //    contents = await _manager.SearchContents(title, genres).ConfigureAwait(false);
+
+        //    var cacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(1));
+        //    _cache.Set(cacheKey, contents, cacheOptions);
+        //}
+
+        var contents = await _manager.SearchContents(title, genres).ConfigureAwait(false);
+
+        if (contents == null || !contents.Any())
+            return NotFound();
+
+        return Ok(contents);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetContent(Guid id)
     {

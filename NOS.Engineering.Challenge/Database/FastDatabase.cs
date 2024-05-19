@@ -59,6 +59,18 @@ public class FastDatabase<TOut, TIn> : IDatabase<TOut, TIn>
         return Task.FromResult(jsonObject);
     }
 
+    public Task<IEnumerable<TOut?>> SearchContents(String title, List<string> genres)
+    {
+        var contents = from c in _dbContext.Contents.ToList()
+                       where (title == null || c.Title == title)
+                      && (genres.Count == 0 || c.GenreList.Intersect(genres).Any())
+                       select c;
+
+        var jsonString = JsonSerializer.Serialize(contents);
+        var jsonObject = JsonSerializer.Deserialize<IEnumerable<TOut?>>(jsonString);
+
+        return Task.FromResult(jsonObject);
+    }
     public Task<TOut?> Update(Guid id, TIn item)
     {
         var content = _dbContext.Contents.Find(id);

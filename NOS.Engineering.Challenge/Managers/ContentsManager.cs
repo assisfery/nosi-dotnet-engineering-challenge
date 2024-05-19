@@ -17,6 +17,11 @@ public class ContentsManager : IContentsManager
         return _database.ReadAll();
     }
 
+    public Task<IEnumerable<Content?>> SearchContents(String title, List<string> genres)
+    {
+        return _database.SearchContents(title, genres);
+    }
+
     public Task<Content?> CreateContent(ContentDto content)
     {
         return _database.Create(content);

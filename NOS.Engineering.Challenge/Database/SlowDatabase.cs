@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 namespace NOS.Engineering.Challenge.Database;
 
@@ -47,6 +48,16 @@ public class SlowDatabase<TOut, TIn>: IDatabase<TOut, TIn>
     {
         Thread.Sleep(5000);
         return Task.FromResult(_database.Values.AsEnumerable());
+    }
+
+    public Task<IEnumerable<TOut?>> SearchContents(String title, List<string> genres)
+    {
+        //Thread.Sleep(5000);
+        var all = _database.Values.AsEnumerable();
+
+        var filtered = _mapper.filter(all, title, genres);
+
+        return Task.FromResult(filtered);
     }
 
     public Task<TOut?> Update(Guid id, TIn item)

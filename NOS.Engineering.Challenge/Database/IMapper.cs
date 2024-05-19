@@ -11,4 +11,5 @@ public interface IMapper<TOut, in TIn>
     //IEnumerable<TOut> FromList(List<Content> items);
 
     //TOut FromObject(Content item);
+    IEnumerable<TOut> filter(IEnumerable<TOut> itens, String title, List<String> genre);
 }
