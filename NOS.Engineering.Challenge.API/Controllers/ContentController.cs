@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NOS.Engineering.Challenge.API.Models;
 using NOS.Engineering.Challenge.Managers;
@@ -13,10 +14,12 @@ public class ContentController : Controller
 {
     private readonly IContentsManager _manager;
     private readonly ILogger<ContentController> _logger;
-    public ContentController(IContentsManager manager, ILogger<ContentController> logger)
+    private readonly IMemoryCache _cache;
+    public ContentController(IContentsManager manager, ILogger<ContentController> logger, IMemoryCache cache)
     {
         _manager = manager;
         _logger = logger;
+        _cache = cache;
     }
     
     [HttpGet]
@@ -24,9 +27,15 @@ public class ContentController : Controller
     {
         _logger.LogInformation("Listing Contents");
 
-        var contents = await _manager.GetManyContents().ConfigureAwait(false);
+        if(!_cache.TryGetValue("GetManyContents", out IEnumerable<Content?>? contents))
+        {
+            contents = await _manager.GetManyContents().ConfigureAwait(false);
 
-        if (!contents.Any())
+            var cacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(1));
+            _cache.Set("GetManyContents", contents, cacheOptions);
+        }        
+
+        if (contents == null || !contents.Any())
             return NotFound();
         
         return Ok(contents);
@@ -37,7 +46,14 @@ public class ContentController : Controller
     {
         _logger.LogInformation("Get Content for " + id.ToString());
 
-        var content = await _manager.GetContent(id).ConfigureAwait(false);
+        string cacheKey = "GetContent:" + id.ToString();
+        if (!_cache.TryGetValue(cacheKey, out Content? content))
+        {
+            content = await _manager.GetContent(id).ConfigureAwait(false);
+
+            var cacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(1));
+            _cache.Set(cacheKey, content, cacheOptions);
+        }
 
         if (content == null)
             return NotFound();

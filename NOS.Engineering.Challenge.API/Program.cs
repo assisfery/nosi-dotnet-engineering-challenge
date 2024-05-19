@@ -7,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args)
 // Add log service
 builder.Logging.AddConsole();
 
+// Add Memory Cache
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 app.MapControllers();
