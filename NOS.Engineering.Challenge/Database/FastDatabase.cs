@@ -64,12 +64,26 @@ public class FastDatabase<TOut, TIn> : IDatabase<TOut, TIn>
         var content = _dbContext.Contents.Find(id);
         if (content != null)
         {
-            var dbItem = _mapper.FromObject(content);
+            //var dbItem = _mapper.FromObject(content);
+            var jsonString = JsonSerializer.Serialize(content);
+            var dbItem = JsonSerializer.Deserialize<TOut>(jsonString);
 
-            content = (_mapper.Patch(dbItem, item) as Content);
+            var updatedItem = _mapper.Patch(dbItem, item);
+            Content updatedContent = (updatedItem as Content);
+
+            content.Title = updatedContent.Title;
+            content.SubTitle = updatedContent.SubTitle;
+            content.Description = updatedContent.Description;
+            content.ImageUrl = updatedContent.ImageUrl;
+            content.Duration = updatedContent.Duration;
+            content.StartTime = updatedContent.StartTime;
+            content.EndTime = updatedContent.EndTime;
+            content.GenreList = updatedContent.GenreList;
 
             _dbContext.SaveChanges();
-            return Task.FromResult(_mapper.FromObject(content));
+            //return Task.FromResult(_mapper.FromObject(content));
+
+            return Task.FromResult(updatedItem);
         }
 
         return Task.FromResult<TOut>(default!)!;
