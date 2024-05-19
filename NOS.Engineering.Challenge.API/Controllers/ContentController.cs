@@ -23,7 +23,7 @@ public class ContentController : Controller
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetManyContents()
+    public async Task<IActionResult> GetManyContents(bool testMode = false)
     {
         _logger.LogInformation("Listing Contents");
 
@@ -32,7 +32,11 @@ public class ContentController : Controller
             contents = await _manager.GetManyContents().ConfigureAwait(false);
 
             var cacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(1));
-            _cache.Set("GetManyContents", contents, cacheOptions);
+            
+            if(!testMode)
+            {
+                _cache.Set("GetManyContents", contents, cacheOptions);
+            }
         }        
 
         if (contents == null || !contents.Any())
