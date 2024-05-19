@@ -13,7 +13,7 @@ public class Content
     public int Duration { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public IEnumerable<string> GenreList { get; set; }
+    public List<string> GenreList { get; set; }
 
     public Content()
     {
@@ -21,7 +21,7 @@ public class Content
     }
 
 
-    public Content(Guid id, string title, string subTitle, string description, string imageUrl, int duration, DateTime startTime, DateTime endTime, IEnumerable<string> genreList)
+    public Content(Guid id, string title, string subTitle, string description, string imageUrl, int duration, DateTime startTime, DateTime endTime, List<string> genreList)
     {
         Id = id;
         Title = title;

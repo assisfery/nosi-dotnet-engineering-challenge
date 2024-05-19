@@ -31,5 +31,15 @@ public class ContentMapper : IMapper<Content, ContentDto>
                 newItem.EndTime ?? oldItem.EndTime,
                 !newItem.GenreList.Any() ? oldItem.GenreList : newItem.GenreList);
     }
-    
+
+    //public IEnumerable<Content> FromList(List<Content> items)
+    //{
+    //    return items.AsEnumerable();
+    //}
+
+    //public Content FromObject(Content item)
+    //{
+    //    return item;
+    //}
+
 }
